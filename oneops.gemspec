@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
 
   s.platform         = Gem::Platform::RUBY
-  s.extra_rdoc_files = %w(README.md LICENSE)
+  s.extra_rdoc_files = %w(README.md)
 
   s.add_dependency "activesupport", "~> 3.2"
   s.add_dependency "rest-client", "~> 1.6"
@@ -23,5 +23,5 @@ Gem::Specification.new do |s|
 
   s.bindir       = 'bin'
   s.require_path = 'lib'
-  s.files        = %w(LICENSE README.md Rakefile) + `git ls-files lib`.split("\n")
+  s.files        = %w(README.md Rakefile) + `git ls-files lib`.split("\n")
 end

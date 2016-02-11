@@ -25,7 +25,7 @@ How To
 
 ```bash
 # Set the OneOps site URL
-$ oneops config set site=https://localhost:9090 -g
+$ oneops config set site=http://localhost:9090 -g
 
 $ oneops auth login
 Enter your OneOps credentials.

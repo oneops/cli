@@ -36,7 +36,7 @@ module OO::Cli::Command
 
     def set(*args)
       args.each do |a|
-        key, value = a.split('=')
+        key, value = a.split('=', 2)
         OO::Cli::Config.set(key, value, @global) if key && value
       end
     end
@@ -51,9 +51,9 @@ module OO::Cli::Command
       display <<-COMMAND_HELP
 Usage:
    oneops config
-   
+
   Management of global and local (by directory) settings and parameters (e.g. user, password, site, default assembly and etc.)
-  
+
 #{options_help}
 
 

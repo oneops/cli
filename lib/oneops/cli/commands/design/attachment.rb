@@ -43,7 +43,7 @@ module OO::Cli
 
     def create(*args)
       attributes = args.inject({}) do |attrs, a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         attrs[attr] = value if attr && value
         attrs
       end
@@ -61,7 +61,7 @@ module OO::Cli
     def update(*args)
       attachment = OO::Api::Design::Attachment.find(Config.assembly, Config.platform, Config.component, Config.attachment)
       args.each do |a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         attachment.ciAttributes[attr] = value if attr && value
       end
       if attachment.save

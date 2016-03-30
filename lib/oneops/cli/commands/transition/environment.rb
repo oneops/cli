@@ -40,7 +40,7 @@ module OO::Cli
 
     def create(*args)
       attributes = args.inject({}) do |attrs, a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         attrs[attr] = value if attr && value
         attrs
       end
@@ -52,7 +52,7 @@ module OO::Cli
 
       if @platform_availability
         env.platform_availability = @platform_availability.inject({}) do |a, availability|
-          platform, availability = availability.split('=')
+          platform, availability = availability.split('=', 2)
           a[platform] = availability
           a
         end
@@ -73,7 +73,7 @@ module OO::Cli
     def update(*args)
       env = OO::Api::Transition::Environment.find(Config.assembly, Config.environment)
       args.each do |a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         env.ciAttributes[attr] = value if attr && value
       end
 

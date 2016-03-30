@@ -12,8 +12,8 @@ module OO::Cli
           @option_parser = option_parser
 
           # This obscured hack is to work around InvalidOption exception of OptionParser.  We do not want a hard
-          # exception because we want give a chance to subcommands to process the options so that they plucked by
-          # relevant command.
+          # exception because we want to give a chance to subcommands to process the options so that options are
+          # plucked by relevant command.
           leftover_args = []
           while true
             begin

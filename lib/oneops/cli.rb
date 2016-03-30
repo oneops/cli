@@ -26,7 +26,6 @@ module OO
   end
 end
 
-require "#{ROOT}/cli/version"
 require "#{ROOT}/cli/display"
 
 OO::Cli::Config.colorize = true

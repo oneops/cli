@@ -31,7 +31,7 @@ module OO::Cli
 
     def create(*args)
       attributes = args.inject({}) do |attrs, a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         if attr && value
           attrs[attr] = value
           if attr == 'location'
@@ -52,7 +52,7 @@ module OO::Cli
     def update(*args)
       cloud = OO::Api::Cloud::Cloud.find(Config.cloud)
       args.each do |a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         cloud.ciAttributes[attr] = value if attr && value
       end
       if cloud.save
@@ -107,7 +107,7 @@ Available attributes:
 Available subcommands:
 
     cloud service  -c <CLOUD> ...
-    
+
 COMMAND_HELP
       end
     end

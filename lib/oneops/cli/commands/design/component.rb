@@ -44,7 +44,7 @@ module OO::Cli
 
     def create(*args)
       attributes = args.inject({}) do |attrs, a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         attrs[attr] = value if attr && value
         attrs
       end
@@ -63,7 +63,7 @@ module OO::Cli
     def update(*args)
       component = OO::Api::Design::Component.find(Config.assembly, Config.platform, Config.component)
       args.each do |a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         component.ciAttributes[attr] = value if attr && value
       end
       component.sibling_depends_on = @sibling_depends

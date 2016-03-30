@@ -55,7 +55,7 @@ Help
         -s, --site SITE                  OneOps host site URL (default: https://api.oneops.com)
         -o, --organization ORGANIZATION  OneOps organization
         -R, --raw-output                 Output raw json from API response
-            --file FILE                  Read attributes from  yaml file.
+            --file FILE                  Read attributes from yaml file.
             --no-color                   Do not colorize output
 
 

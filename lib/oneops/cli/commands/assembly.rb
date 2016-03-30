@@ -38,7 +38,7 @@ module OO::Cli
 
     def create(*args)
       attributes = args.inject({}) do |attrs, a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         attrs[attr] = value if attr && value
         attrs
       end
@@ -53,7 +53,7 @@ module OO::Cli
     def update(*args)
       assembly = OO::Api::Assembly.find(Config.assembly)
       args.each do |a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         assembly.ciAttributes[attr] = value if attr && value
       end
       if assembly.save
@@ -84,9 +84,9 @@ module OO::Cli
       display <<-COMMAND_HELP
 Usage:
    oneops assembly
-   
+
    Management of assemblies.
-   
+
 #{options_help}
 
 Available actions:

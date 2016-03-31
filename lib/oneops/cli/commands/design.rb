@@ -5,7 +5,7 @@ module OO::Cli
         opts.on('-a', '--assembly ASSEMBLY', 'Assembly name') { |a| Config.set_in_place(:assembly, a)}
         opts.on('-C', '--comment TEXT', 'Commit comment') { |a| @desc = a}
         opts.on('-f', '--format FORMAT', [:yaml, :json], 'Output format: yaml or xml (default: yaml)') { |f| OO::Cli::Config.set_in_place(:format, f) }
-        opts.on('--design-file FILE', 'Design configuration file in yaml or json format.') { |f| @design_file = f }
+        opts.on('--file FILE', 'Design configuration file in yaml or json format (defaults to "oneops-design.yaml" in local dir).') { |f| @design_file = f }
       end
     end
 
@@ -35,7 +35,7 @@ Available actions:
     design discard -a <ASSEMBLY>
     design packs
     design extract -a <ASSEMBLY> [-f|--format yaml|json]
-    design load    -a <ASSEMBLY> --file <file_name>
+    design load    -a <ASSEMBLY> [[--file] <FILE_NAME>]
 
 
 Available subcommands:
@@ -111,15 +111,21 @@ COMMAND_HELP
     end
 
     def load(*args)
+      @design_file = Config.attributes_file
       unless @design_file
-        say 'Please specify design configuration yaml or json file!'.red
-        return false
+        @design_file = args.first if args.length == 1
+        unless @design_file.present?
+          @design_file = 'oneops-design.yaml'
+          say "Design configuration file not specified, will look for #{@design_file.cyan} in current dir.".yellow
+        end
       end
 
       unless File.exist?(@design_file)
         say "Could not find design configuraion file: #{@design_file.magenta}".red
         return false
       end
+
+      say "Using design configuration file: #{@design_file.cyan}"
 
       design = OO::Api::Design::Design.new(Config.assembly)
       ok = design.load(File.open(@design_file).read)

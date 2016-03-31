@@ -22,7 +22,10 @@ class OO::Cli::Runner
 
       parse_options!
 
-      YAML.load(File.open(@attributes_file)).each_pair { |k, v| @args << "#{k}=#{v}" } if @attributes_file
+      if @attributes_file.present?
+        OO::Cli::Config.set_in_place(:attributes_file, @attributes_file)
+        YAML.load(File.open(@attributes_file)).each_pair { |k, v| @args << "#{k}=#{v}" }
+      end
 
       if @args.present?
         help = @args.delete('help')

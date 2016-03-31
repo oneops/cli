@@ -45,7 +45,7 @@ module OO::Cli
     def pull(*args)
       env = OO::Api::Transition::Environment.find(Config.assembly, Config.environment)
       env.platform_availability = args.inject({}) do |a, e|
-        platform, availability = e.split('=')
+        platform, availability = e.split('=', 2)
         a[platform] = availability
         a
       end

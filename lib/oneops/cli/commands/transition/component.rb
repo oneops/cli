@@ -40,7 +40,7 @@ module OO::Cli
     def update(*args)
       component = OO::Api::Transition::Component.find(Config.assembly, Config.environment, Config.platform, Config.component)
       args.each do |a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         component.ciAttributes[attr] = value if attr && value
       end
       component.sibling_depends_on = @sibling_depends
@@ -68,12 +68,12 @@ module OO::Cli
         say "#{'Failed:'.yellow}\n   #{component.errors.join("\n   ")}"
       end
     end
-       
+
     def help(*args)
       display <<-COMMAND_HELP
 Usage:
    oneops transition component
-   
+
    Management of components in transition.
 
 #{options_help}

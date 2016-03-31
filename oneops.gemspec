@@ -9,17 +9,17 @@ Gem::Specification.new do |s|
   s.email       = 'support@oneops.com'
   s.homepage    = 'http://www.oneops.com'
   s.summary     = 'OneOps API library and CLI'
-  s.license	= 'Apache-2.0'
+  s.license	    = 'Apache-2.0'
   s.description = 'Client library and CLI that provides access to the OneOps Cloud Application Management Platform.'
   s.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
 
   s.platform         = Gem::Platform::RUBY
   s.extra_rdoc_files = %w(README.md)
 
-  s.add_dependency "activesupport", "~> 3.2"
-  s.add_dependency "rest-client", "~> 1.6"
-  s.add_dependency "netrc", "~> 0.7"
-  s.add_dependency "thor", "~> 0.19"
+  s.add_dependency 'activesupport', '4.1.10'
+  s.add_dependency 'rest-client', '~> 1.6'
+  s.add_dependency 'netrc', '~> 0.7'
+  s.add_dependency 'thor', '~> 0.19'
 
   s.bindir       = 'bin'
   s.require_path = 'lib'

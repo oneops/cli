@@ -1,12 +1,12 @@
 module OO::Cli
   class Command::Design::Variable < Command::Base
-    
+
     def option_parser
       OptionParser.new do |opts|
         opts.on('-p', '--platform PLATFORM', 'Platform name') { |a| Config.set_in_place(:platform, a)}
       end
     end
-    
+
     def validate(action, *args)
       unless action == :default || action == :list || args.size > 0
         say 'Please specify variable name!'.red
@@ -31,7 +31,7 @@ module OO::Cli
     end
 
     def create(*args)
-      name, value = args[0].split('=')
+      name, value = args[0].split('=', 2)
       variable = OO::Api::Design::Variable.new(Config.assembly, Config.platform, {:ciName => name, :ciAttributes => {:value => value}})
       if variable.save
         say variable.to_pretty
@@ -42,7 +42,7 @@ module OO::Cli
     end
 
     def update(*args)
-      name, value = args[0].split('=')
+      name, value = args[0].split('=', 2)
       variable = OO::Api::Design::Variable.find(Config.assembly, Config.platform, name)
       variable.ciAttributes = {:value => value}
       if variable.save
@@ -65,7 +65,7 @@ module OO::Cli
       display <<-COMMAND_HELP
 Usage:
    oneops design variable
-   
+
    Management of variables in design.
 
 Available actions:

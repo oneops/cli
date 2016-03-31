@@ -1,12 +1,12 @@
 module OO::Cli
   class Command::Transition::Variable < Command::Base
-    
+
     def option_parser
       OptionParser.new do |opts|
         opts.on('-p', '--platform PLATFORM', 'Platform name') { |a| Config.set_in_place(:platform, a)}
       end
     end
-    
+
     def validate(action, *args)
       unless action == :default || action == :list || args.size > 0
         say 'Please specify variable name!'.red
@@ -31,7 +31,7 @@ module OO::Cli
     end
 
     def update(*args)
-      name, value = args[0].split('=')
+      name, value = args[0].split('=', 2)
       sticky = name.end_with?('_')
       variable = OO::Api::Transition::Variable.find(Config.assembly, Config.environment, Config.platform, sticky ? name[0...-1] : name)
       variable.ciAttributes[sticky ? 'value_' : 'value'] = value
@@ -46,7 +46,7 @@ module OO::Cli
       display <<-COMMAND_HELP
 Usage:
    oneops transition variable
-   
+
    Management of variables in transition.
 
 Available actions:

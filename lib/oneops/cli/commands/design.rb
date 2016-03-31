@@ -3,7 +3,49 @@ module OO::Cli
     def option_parser
       OptionParser.new do |opts|
         opts.on('-a', '--assembly ASSEMBLY', 'Assembly name') { |a| Config.set_in_place(:assembly, a)}
-        opts.on('-C TEXT', 'Commit comment') { |a| @desc = a}
+        opts.on('-C', '--comment TEXT', 'Commit comment') { |a| @desc = a}
+        opts.on('-f', '--format FORMAT', [:yaml, :json], 'Output format: yaml or xml (default: yaml)') { |f| OO::Cli::Config.set_in_place(:format, f) }
+        opts.on('--design-file FILE', 'Design configuration file in yaml or json format.') { |f| @design_file = f }
+      end
+    end
+
+    def help(*args)
+      subcommand = args.shift
+      if subcommand == 'platform'
+        OO::Cli::Command::Design::Platform.new.help(*args)
+      elsif subcommand == 'component'
+        OO::Cli::Command::Design::Component.new.help(*args)
+      elsif subcommand == 'variable'
+        OO::Cli::Command::Design::Variable.new.help(*args)
+      elsif subcommand == 'attachment'
+        OO::Cli::Command::Design::Attachment.new.help(*args)
+      else
+        display <<-COMMAND_HELP
+Usage:
+   oneops design
+
+   Assembly design management.
+
+#{options_help}
+
+Available actions:
+
+    design show    -a <ASSEMBLY>
+    design commit  -a <ASSEMBLY> [--comment <COMMENT>]
+    design discard -a <ASSEMBLY>
+    design packs
+    design extract -a <ASSEMBLY> [-f|--format yaml|json]
+    design load    -a <ASSEMBLY> --file <file_name>
+
+
+Available subcommands:
+
+    design platform   -a <ASSEMBLY> ...
+    design variable   -a <ASSEMBLY> ...
+    design component  -a <ASSEMBLY> ...
+    design attachment -a <ASSEMBLY> ...
+
+COMMAND_HELP
       end
     end
 
@@ -58,6 +100,38 @@ module OO::Cli
       end
     end
 
+    def extract(*args)
+      format = Config.format || 'yaml'
+      design = OO::Api::Design::Design.new(Config.assembly).extract(format)
+      if design
+        say format.to_s == 'json' ? JSON.pretty_unparse(design) : design
+      else
+        say 'Failed to extract!'.red
+      end
+    end
+
+    def load(*args)
+      unless @design_file
+        say 'Please specify design configuration yaml or json file!'.red
+        return false
+      end
+
+      unless File.exist?(@design_file)
+        say "Could not find design configuraion file: #{@design_file.magenta}".red
+        return false
+      end
+
+      design = OO::Api::Design::Design.new(Config.assembly)
+      ok = design.load(File.open(@design_file).read)
+      if ok
+        say 'Successfully loaded design.'.green
+      else
+        say 'Failed:'.yellow
+        say design.errors.to_yaml.gsub("---\n", '').red
+      end
+
+    end
+
     def packs(*args)
       say OO::Api::Pack.all.to_pretty
     end
@@ -76,44 +150,6 @@ module OO::Cli
 
     def attachment(*args)
       OO::Cli::Command::Design::Attachment.new.process(*args)
-    end
-
-    def help(*args)
-      subcommand = args.shift
-      if subcommand == 'platform'
-        OO::Cli::Command::Design::Platform.new.help(*args)
-      elsif subcommand == 'component'
-        OO::Cli::Command::Design::Component.new.help(*args)
-      elsif subcommand == 'variable'
-        OO::Cli::Command::Design::Variable.new.help(*args)
-      elsif subcommand == 'attachment'
-        OO::Cli::Command::Design::Attachment.new.help(*args)
-      else
-        display <<-COMMAND_HELP
-Usage:
-   oneops design
-
-   Assembly design management.
-
-#{options_help}
-
-Available actions:
-
-    design show    -a <ASSEMBLY>
-    design commit  -a <ASSEMBLY> [--comment <COMMENT>]
-    design discard -a <ASSEMBLY>
-    design packs
-
-
-Available subcommands:
-
-    design platform   -a <ASSEMBLY> ...
-    design variable   -a <ASSEMBLY> ...
-    design component  -a <ASSEMBLY> ...
-    design attachment -a <ASSEMBLY> ...
-
-COMMAND_HELP
-      end
     end
   end
 end

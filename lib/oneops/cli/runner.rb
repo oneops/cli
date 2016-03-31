@@ -65,7 +65,7 @@ class OO::Cli::Runner
       puts e.message
       puts e.backtrace
     ensure
-      if OO::Cli::Config.debug
+      if OO::Cli::Config.debug || OO::Cli::Config.timing == 'true'
         say ok ? "#{'DONE'.green} (#{"#{((Time.now - start_time) * 100).round / 100.0}ms".cyan}) " : 'FAILED'.red
       end
     end
@@ -114,6 +114,7 @@ USAGE
       opts.on('-R', '--raw-output', 'Output raw json from API response') { OO::Cli::Config.set_in_place(:raw_output, true) }
       opts.on('--file FILE', 'Read attributes from  yaml file.') { |f| @attributes_file = f }
       opts.on('--no-color', 'Do not colorize output') { OO::Cli::Config.colorize = false }
+      opts.on('--timing', 'Show command time duration stat.') { OO::Cli::Config.set_in_place(:timing, true) }
     end
 
     # This obscured technique is to work around InvalidOption exception of OptionParser.  This will allow us to pluck relevant (see above)

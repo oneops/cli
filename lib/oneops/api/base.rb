@@ -37,7 +37,11 @@ module OO::Api
                                              :headers => headers})
 
         if status >= 200 && status < 210
-          data = JSON.parse(body)
+          if url =~ (/\.yaml(\?.*)?$/)
+            data = body
+          else
+            data = JSON.parse(body)
+          end
           if instance
             instance.data = data
             return true

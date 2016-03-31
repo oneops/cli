@@ -36,7 +36,7 @@ module OO::Cli
 
     def create(*args)
       attributes = args.inject({}) do |attrs, a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         attrs[attr] = value if attr && value
         attrs
       end
@@ -61,7 +61,7 @@ module OO::Cli
     def update(*args)
       source = OO::Api::Cloud::Service.find(Config.cloud, Config.service)
       args.each do |a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         source.ciAttributes[attr] = value if attr && value
       end
       if source.save

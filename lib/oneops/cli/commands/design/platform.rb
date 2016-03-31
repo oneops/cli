@@ -12,14 +12,14 @@ module OO::Cli
       display <<-COMMAND_HELP
 Usage:
    oneops design platform
-   
+
    Management of platforms in design.
 
 #{options_help}
 
 Available actions:
 
-    design platform list   -a <ASSEMBLY> 
+    design platform list   -a <ASSEMBLY>
     design platform show   -a <ASSEMBLY> -p <PLATFORM>
     design platform create -a <ASSEMBLY> -p <PLATFORM> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]] [-l <P1>[,<P2>[,...]]]
     design platform update -a <ASSEMBLY> -p <PLATFORM> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]] [-l <P1>[,<P2>[,...]]]
@@ -34,7 +34,7 @@ Available attributes:
 
 COMMAND_HELP
     end
-    
+
     def validate(action, *args)
       unless action == :default || action == :list || Config.platform.present?
         say 'Please specify platform!'.red
@@ -60,7 +60,7 @@ COMMAND_HELP
 
     def create(*args)
       attributes = args.inject({}) do |attrs, a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         attrs[attr] = value if attr && value
         attrs
       end
@@ -77,7 +77,7 @@ COMMAND_HELP
     def update(*args)
       platform = OO::Api::Design::Platform.find(Config.assembly, Config.platform)
       args.each do |a|
-        attr, value = a.split('=')
+        attr, value = a.split('=', 2)
         platform.ciAttributes[attr] = value if attr && value
       end
       platform.links_to = @links_to
@@ -102,6 +102,6 @@ COMMAND_HELP
         say "#{'Failed:'.yellow}\n   #{platform.errors.join("\n   ")}"
       end
     end
-    
+
   end
 end

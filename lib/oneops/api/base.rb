@@ -31,10 +31,11 @@ module OO::Api
         else
           url = "#{OO::Api::Config.site}/#{path}"
         end
-        status, body = perform_http_request({:method  => method,
-                                             :url     => url,
-                                             :payload => payload,
-                                             :headers => headers})
+        status, body = perform_http_request({:method     => method,
+                                             :url        => url,
+                                             :payload    => payload,
+                                             :headers    => headers,
+                                             :verify_ssl => OO::Api::Config.verify_ssl})
 
         if status >= 200 && status < 210
           if url =~ (/\.yaml(\?.*)?$/)
@@ -74,6 +75,7 @@ module OO::Api
           result = [resp.code, resp.body]
           if OO::Api::Config.debug
             puts '>>>'
+            puts 'Skipping SSL verification'.yellow unless OO::Api::Config.verify_ssl
             puts "REQUEST: #{req.method} #{req.url}"
             puts "REQUEST_BODY: #{request[:payload].inspect}" if request[:payload]
             puts "RESPONSE_HEADERS:"

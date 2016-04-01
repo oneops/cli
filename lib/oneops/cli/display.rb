@@ -108,7 +108,7 @@ end
 
 class Hash
   def to_console(options = {})
-    self.sort.map do |k,v|
+    self.sort.map do |k, v|
       if k == 'created' or k == 'updated'
         "#{k.green} #{Time.at(v/1000).utc.to_s}"
       elsif v.class == Hash or v.class == Array
@@ -118,15 +118,23 @@ class Hash
       end
     end
   end
+
+  def to_pretty_json(options = {})
+    JSON.pretty_unparse(self)
+  end
 end
 
 class Array
   def to_console(options = {})
-    return self.map { |r| r['ciName'] }
+    map {|r| r.include?('ciName') ? r['ciName'] : r}
+  end
+
+  def to_pretty_json(options = {})
+    map(&:to_pretty_json)
   end
 
   def as_pretty(options)
-    map { |e| e.as_pretty(options) }
+    map {|e| e.as_pretty(options)}
   end
 end
 

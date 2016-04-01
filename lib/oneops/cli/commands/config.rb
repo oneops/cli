@@ -52,24 +52,37 @@ module OO::Cli::Command
 Usage:
    oneops config
 
-  Management of global and local (by directory) settings and parameters (e.g. user, password, site, default assembly and etc.)
+   Management of global and local (by directory) configuration settings and default command parameters.
 
 #{options_help}
 
 
 Available actions:
 
-    config list <options>
-    config set <parameter>=<VALUE> [<parameter>=<VALUE> ...] <options>
-    config clear <parameter> [<parameter> ...] <options>
+    config list [-g|-l]
+    config set <param_or_setting>=<VALUE> [<param_or_setting>=<VALUE> ...] -g|-l
+    config clear <param_or_setting> [<param_or_setting> ...] -g|-l
 
 
-Required parameters:
+Required settings:
 
     site         OneOps site url
-    user         User ID (login name)
-    password     Password (login password)
-    organization Your organization
+    user         OneOps user ID (login name)
+
+
+Optional settings:
+
+    insecure     Set to 'true' to skip SSL verification (not SSL certificate validation).
+    timing       Set to 'true' to display command execution duration.
+
+
+Optional parameters:
+
+    organization Current organization
+    assembly     Current assembly
+    environment  Current environment
+    platform     Current platform
+    ...
 
 COMMAND_HELP
     end

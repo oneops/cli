@@ -57,18 +57,20 @@ module OO
 
         def configure_api
           OO::Api::Config.debug = OO::Cli::Config.debug
+          OO::Api::Config.verify_ssl = (OO::Cli::Config.insecure != 'true')
           OO::Api::Config.organization = OO::Cli::Config.organization
-          site = get_value(:site) || 'https://my.oneops.com'
-          OO::Api::Config.send('site=', site)
-          credentials = OO::Cli::Credentials.read(site)
 
+          site = OO::Cli::Config.site || 'http://localhost:3000'
+          OO::Api::Config.site = site
+
+          credentials = OO::Cli::Credentials.read(site)
           if credentials.blank? || credentials[0].blank? || credentials[1].blank?
             say "Please run 'oo auth login' command first to login.".red
             return false
           end
-
           OO::Api::Config.send("#{:user}=", credentials[0])
           OO::Api::Config.send("#{:password}=", credentials[1])
+
           return true
         end
 

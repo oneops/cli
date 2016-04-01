@@ -1,29 +1,20 @@
 module OO::Cli::Command
   class Help < Base
+    skip_configure_api
+
     def process(*args)
       if args.size == 0
-        say command_usage
-      else
-        cmd = OO::Cli::Command.const_get(args.shift.capitalize)
-        cmd.new.send(:help, *args)
-      end
-    end
-
-    def help(*args)
-      display <<-COMMAND_HELP
+        display <<-USAGE
 Usage:
-    oneops help
 
-    Display oneops CLI help info.
-      COMMAND_HELP
-    end
+  oneops|oo [options] command [<args>] [command_options]
 
-    def command_usage
-<<-USAGE
-Currently available oneops commands are:
+#{OO::Cli::Runner::OPTION_PARSER}
+
+Available commands:
 
   General
-  ---------------------
+  -------
     version             Display OneOps CLI gem version.
     help [<command>]    Display this help or help for a particular command.
 
@@ -31,8 +22,8 @@ Currently available oneops commands are:
   ---------------------
     config              Set or display global parameters (e.g. login, password, host, default assembly).
 
-  Commands
-  ---------------------
+  OneOps Management Commands
+  --------------------------
     account             Account management.
     organization        Organization management.
     cloud               Cloud management.
@@ -42,9 +33,18 @@ Currently available oneops commands are:
     transition          Assembly transition management.
     operations          Assmebly operations management.
 
+For more information about commands try:
+   oneops help <command>
 USAGE
+
+      else
+        begin
+          cmd = args.shift
+          OO::Cli::Command.const_get(cmd.capitalize).new.send(:help, *args)
+        rescue NameError => e
+          say "Unknown command [#{cmd}]".red
+        end
+      end
     end
   end
 end
-
-# TODO remove this lib, not needed

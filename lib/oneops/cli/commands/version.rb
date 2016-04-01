@@ -1,5 +1,7 @@
 module OO::Cli::Command
   class Version < Base
+    skip_configure_api
+
     def process(*args)
       say OO::VERSION.green
     end

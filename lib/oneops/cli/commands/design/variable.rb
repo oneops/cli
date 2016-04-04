@@ -1,10 +1,28 @@
 module OO::Cli
   class Command::Design::Variable < Command::Base
-
     def option_parser
       OptionParser.new do |opts|
         opts.on('-p', '--platform PLATFORM', 'Platform name') { |a| Config.set_in_place(:platform, a)}
       end
+    end
+
+    def help(*args)
+      display <<-COMMAND_HELP
+Usage:
+   oneops design variable
+
+   Management of variables in design.
+
+Available actions:
+
+    design variable list   -a <ASSEMBLY> [-p <PLATFORM>]
+    design variable show   -a <ASSEMBLY> [-p <PLATFORM>] <NAME>
+    design variable open   -a <ASSEMBLY> [-p <PLATFORM>] <NAME>
+    design variable create -a <ASSEMBLY> [-p <PLATFORM>] <NAME>=<VALUE>
+    design variable update -a <ASSEMBLY> [-p <PLATFORM>] <NAME>=<VALUE>
+    design variable delete -a <ASSEMBLY> [-p <PLATFORM>] <NAME>
+
+COMMAND_HELP
     end
 
     def validate(action, *args)
@@ -28,6 +46,11 @@ module OO::Cli
     def show(*args)
       variable = OO::Api::Design::Variable.find(Config.assembly, Config.platform, args[0])
       say variable.to_pretty
+    end
+
+    def open(*args)
+      variable = OO::Api::Design::Variable.find(Config.assembly, Config.platform, args[0])
+      open_ci(variable.ciId)
     end
 
     def create(*args)
@@ -59,24 +82,6 @@ module OO::Cli
       else
         say "#{'Failed:'.yellow}\n   #{variable.errors.join("\n   ")}"
       end
-    end
-
-    def help(*args)
-      display <<-COMMAND_HELP
-Usage:
-   oneops design variable
-
-   Management of variables in design.
-
-Available actions:
-
-    design variable list   -a <ASSEMBLY> [-p <PLATFORM>]
-    design variable show   -a <ASSEMBLY> [-p <PLATFORM>] <NAME>
-    design variable create -a <ASSEMBLY> [-p <PLATFORM>] <NAME>=<VALUE>
-    design variable update -a <ASSEMBLY> [-p <PLATFORM>] <NAME>=<VALUE>
-    design variable delete -a <ASSEMBLY> [-p <PLATFORM>] <NAME>
-
-COMMAND_HELP
     end
   end
 end

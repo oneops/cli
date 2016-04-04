@@ -27,6 +27,7 @@ module OO
 end
 
 require "#{ROOT}/cli/display"
+require "#{ROOT}/version"
 
 OO::Cli::Config.colorize = true
 if WINDOWS

@@ -1,8 +1,9 @@
+require 'launchy'
+
 module OO::Cli
   module Command
     class Base
       @@configure_api = true
-
       def self.skip_configure_api
         @@configure_api = false
       end
@@ -41,7 +42,7 @@ module OO::Cli
             return
           end
 
-            return unless validate(action, *leftover_args)
+          return unless validate(action, *leftover_args)
 
           send(action, *leftover_args)
         end
@@ -63,10 +64,30 @@ module OO::Cli
         say 'No help available!'
       end
 
+      def open(*args)
+        url = open_url(*args)
+        if url
+          Launchy.open(url)
+        else
+          say "Invalid action for command <#{self.class.name.split('::').last.downcase}>".red
+        end
+      end
+
+
+      protected
+
       def options_help
         @option_parser ||= option_parser
         @option_parser.banner = "\nAvailable options:\n\n"
         @option_parser
+      end
+
+      def open_url(*args)
+        nil
+      end
+
+      def open_ci(ci_id)
+        Launchy.open("#{OO::Api::Config.site}/r/ci/#{ci_id}")
       end
     end
   end

@@ -21,6 +21,7 @@ Available actions:
 
     design platform list   -a <ASSEMBLY>
     design platform show   -a <ASSEMBLY> -p <PLATFORM>
+    design platform open   -a <ASSEMBLY> -p <PLATFORM>
     design platform create -a <ASSEMBLY> -p <PLATFORM> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]] [-l <P1>[,<P2>[,...]]]
     design platform update -a <ASSEMBLY> -p <PLATFORM> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]] [-l <P1>[,<P2>[,...]]]
     design platform delete -a <ASSEMBLY> -p <PLATFORM>
@@ -51,6 +52,11 @@ COMMAND_HELP
     def list(*args)
       platforms = OO::Api::Design::Platform.all(Config.assembly)
       say platforms.to_pretty( :title => Config.assembly )
+    end
+
+    def open(*args)
+      platform = OO::Api::Design::Platform.find(Config.assembly, Config.platform)
+      open_ci(platform.ciId)
     end
 
     def show(*args)
@@ -102,6 +108,5 @@ COMMAND_HELP
         say "#{'Failed:'.yellow}\n   #{platform.errors.join("\n   ")}"
       end
     end
-
   end
 end

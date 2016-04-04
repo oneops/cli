@@ -8,6 +8,33 @@ module OO::Cli
       end
     end
 
+    def help(*args)
+      display <<-COMMAND_HELP
+Usage:
+   oneops design attachment
+
+   Management of component attachments in design.
+
+#{options_help}
+
+Available actions:
+
+    design attachment list   -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT>
+    design attachment show   -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -h <ATTACHMENT>
+    design attachment open   -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -h <ATTACHMENT>
+    design attachment create -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -h <ATTACHMENT> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]]
+    design attachment update -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -h <ATTACHMENT> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]]
+    design attachment delete -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -h <ATTACHMENT>
+
+Available attributes:
+
+    path
+    priority
+    run_on
+
+COMMAND_HELP
+    end
+
     def validate(action, *args)
       unless Config.platform.present?
         say 'Please specify platform!'.red
@@ -39,6 +66,11 @@ module OO::Cli
     def show(*args)
       attachment = OO::Api::Design::Attachment.find(Config.assembly, Config.platform, Config.component, Config.attachment)
       say attachment.to_pretty
+    end
+
+    def open(*args)
+      attachment = OO::Api::Design::Attachment.find(Config.assembly, Config.platform, Config.component, Config.attachment)
+      open_ci(attachment.ciId)
     end
 
     def create(*args)
@@ -74,32 +106,6 @@ module OO::Cli
     def delete(*args)
       attachment = OO::Api::Design::Attachment.find(Config.assembly, Config.platform, Config.component, Config.attachment)
       say "#{'Failed:'.yellow}\n   #{attachment.errors.join("\n   ")}" unless attachment.destroy
-    end
-
-    def help(*args)
-      display <<-COMMAND_HELP
-Usage:
-   oneops design attachment
-
-   Management of component attachments in design.
-
-#{options_help}
-
-Available actions:
-
-    design attachment list   -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT>
-    design attachment show   -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -h <ATTACHMENT>
-    design attachment create -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -h <ATTACHMENT> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]]
-    design attachment update -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -h <ATTACHMENT> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]]
-    design attachment delete -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -h <ATTACHMENT>
-
-Available attributes:
-
-    path
-    priority
-    run_on
-
-COMMAND_HELP
     end
   end
 end

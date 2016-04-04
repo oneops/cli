@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'rest-client', '~> 1.6'
   s.add_dependency 'netrc', '~> 0.7'
   s.add_dependency 'thor', '~> 0.19'
+  s.add_dependency 'launchy', '~> 2.4'
 
   s.bindir       = 'bin'
   s.require_path = 'lib'

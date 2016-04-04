@@ -8,6 +8,34 @@ module OO::Cli
       end
     end
 
+    def help(*args)
+      display <<-COMMAND_HELP
+Usage:
+   oneops assembly
+
+   Management of assemblies.
+
+#{options_help}
+
+Available actions:
+
+   assembly list
+   assembly show    -a <ASSEMBLY>
+   assembly open    -a <ASSEMBLY>
+   assembly create  -a <ASSEMBLY> <attribute>=<VALUE> [<attribute>=<VALUE> ...]
+   assembly update  -a <ASSEMBLY> <attribute>=<VALUE> [<attribute>=<VALUE> ...]
+   assembly delete  -a <ASSEMBLY>
+   assembly clone   -a <ASSEMBLY> -t <TARGET>
+   assembly catalog -a <ASSEMBLY> -t <TARGET>
+
+
+Available attributes:
+
+   description    Assembly description.
+
+COMMAND_HELP
+    end
+
     def validate(action, *args)
       unless action == :default || action == :list || Config.assembly.present?
         say 'Please specify assembly!'.red
@@ -29,6 +57,11 @@ module OO::Cli
     def list(*args)
       assemblies = OO::Api::Assembly.all
       say assemblies.to_pretty
+    end
+
+    def open(*args)
+      assembly = OO::Api::Assembly.find(Config.assembly)
+      open_ci(assembly.ciId)
     end
 
     def show(*args)
@@ -78,33 +111,6 @@ module OO::Cli
       assembly = OO::Api::Assembly.find(Config.assembly)
       catalog = assembly.catalog(@target, @desc)
       say catalog ? catalog.to_pretty : "#{'Failed:'.yellow}\n   #{assembly.errors.join("\n   ")}"
-    end
-
-    def help(*args)
-      display <<-COMMAND_HELP
-Usage:
-   oneops assembly
-
-   Management of assemblies.
-
-#{options_help}
-
-Available actions:
-
-   assembly list
-   assembly show    -a <ASSEMBLY>
-   assembly create  -a <ASSEMBLY> <attribute>=<VALUE> [<attribute>=<VALUE> ...]
-   assembly update  -a <ASSEMBLY> <attribute>=<VALUE> [<attribute>=<VALUE> ...]
-   assembly delete  -a <ASSEMBLY>
-   assembly clone   -a <ASSEMBLY> -t <TARGET>
-   assembly catalog -a <ASSEMBLY> -t <TARGET>
-
-
-Available attributes:
-
-   description    Assembly description.
-
-COMMAND_HELP
     end
   end
 end

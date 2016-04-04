@@ -1,5 +1,6 @@
 module OO::Cli
   class Command::Design::Component < Command::Base
+
     def option_parser
       OptionParser.new do |opts|
         opts.on('-p', '--platform PLATFORM', 'Platform name') { |p| Config.set_in_place(:platform, p)}
@@ -7,6 +8,31 @@ module OO::Cli
         opts.on('-t', '--type TYPE', 'Component type (e.g. "build", "compute", etc.)') { |t| @type = t}
         opts.on('-d', '--sibling_depends C1[,C2[,...]]', Array, 'Dependence to other sibling components (i.e. of the same type)') { |sd|  @sibling_depends = sd}
       end
+    end
+
+    def help(*args)
+      display <<-COMMAND_HELP
+Usage:
+   oneops design component
+
+   Management of components in design.
+
+#{options_help}
+
+Available actions:
+
+    design component list   -a <ASSEMBLY> -p <PLATFORM>
+    design component show   -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT>
+    design component open   -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT>
+    design component create -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -t <TYPE> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]] [-l <C1>[,<C2>[,...]]]
+    design component update -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]] [-l <C1>[,<C2>[,...]]]
+    design component delete -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT>
+
+Available attributes:
+
+    Varies by component type.
+
+COMMAND_HELP
     end
 
     def validate(action, *args)
@@ -40,6 +66,11 @@ module OO::Cli
     def show(*args)
       component = OO::Api::Design::Component.find(Config.assembly, Config.platform, Config.component)
       say component.to_pretty
+    end
+
+    def open(*args)
+      component = OO::Api::Design::Component.find(Config.assembly, Config.platform, Config.component)
+      open_ci(component.ciId)
     end
 
     def create(*args)
@@ -77,30 +108,6 @@ module OO::Cli
     def delete(*args)
       component = OO::Api::Design::Component.find(Config.assembly, Config.platform, Config.component)
       say "#{'Failed:'.yellow}\n   #{component.errors.join("\n   ")}" unless component.destroy
-    end
-
-    def help(*args)
-      display <<-COMMAND_HELP
-Usage:
-   oneops design component
-
-   Management of components in design.
-
-#{options_help}
-
-Available actions:
-
-    design component list   -a <ASSEMBLY> -p <PLATFORM>
-    design component show   -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT>
-    design component create -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -t <TYPE> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]] [-l <C1>[,<C2>[,...]]]
-    design component update -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]] [-l <C1>[,<C2>[,...]]]
-    design component delete -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT>
-
-Available attributes:
-
-    Varies by component type.
-
-COMMAND_HELP
     end
   end
 end

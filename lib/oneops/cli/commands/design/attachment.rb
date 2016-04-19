@@ -20,11 +20,11 @@ Usage:
 Available actions:
 
     design attachment list   -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT>
-    design attachment show   -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -h <ATTACHMENT>
-    design attachment open   -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -h <ATTACHMENT>
-    design attachment create -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -h <ATTACHMENT> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]]
-    design attachment update -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -h <ATTACHMENT> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]]
-    design attachment delete -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -h <ATTACHMENT>
+    design attachment show   -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -m <ATTACHMENT>
+    design attachment open   -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -m <ATTACHMENT>
+    design attachment create -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -m <ATTACHMENT> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]]
+    design attachment update -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -m <ATTACHMENT> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]]
+    design attachment delete -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -m <ATTACHMENT>
 
 Available attributes:
 

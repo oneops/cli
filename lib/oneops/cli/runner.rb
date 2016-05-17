@@ -84,7 +84,7 @@ class OO::Cli::Runner
       puts e.backtrace
     ensure
       if OO::Cli::Config.debug || OO::Cli::Config.timing == 'true'
-        say ok ? "#{'DONE'.green} (#{"#{((Time.now - start_time) * 100).round / 100.0}ms".cyan}) " : 'FAILED'.red
+        say ok ? "#{'DONE'.green} (#{"#{((Time.now - start_time) * 100).round / 100.0}s".cyan}) " : 'FAILED'.red
       end
     end
     exit(ok)

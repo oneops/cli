@@ -41,11 +41,11 @@ class OO::Api::Transition::Environment < OO::Api::Base
   end
 
   def enable
-    return self.class.request(:get, "assemblies/#{assembly}/transition/environments/#{data[:ciId]}/enable", '', self)
+    return self.class.request(:put, "assemblies/#{assembly}/transition/environments/#{data[:ciId]}/enable", '', self)
   end
 
   def disable
-    return self.class.request(:get, "assemblies/#{assembly}/transition/environments/#{data[:ciId]}/disable", '', self)
+    return self.class.request(:put, "assemblies/#{assembly}/transition/environments/#{data[:ciId]}/disable", '', self)
   end
 
   def as_pretty(options)

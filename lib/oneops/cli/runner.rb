@@ -18,7 +18,7 @@ class OO::Cli::Runner
     opts.on('-q', '--quiet', 'No output') { OO::Cli::Config.output = nil }
     opts.on('-R', '--raw-output', 'Output raw json from API response') { OO::Cli::Config.set_in_place(:raw_output, true) }
     opts.on('-s', '--site SITE', 'OneOps host site URL (default: https://api.oneops.com)') { |site| OO::Cli::Config.set_in_place(:site, site)}
-    opts.on('--timing', 'Show command time duration stat.') { OO::Cli::Config.set_in_place(:timing, 'true') }
+    opts.on('--duration', 'Show command time duration stat.') { OO::Cli::Config.set_in_place(:timing, 'true') }
   end
 
   def self.run(args)
@@ -84,7 +84,7 @@ class OO::Cli::Runner
       puts e.backtrace
     ensure
       if OO::Cli::Config.debug || OO::Cli::Config.timing == 'true'
-        say ok ? "#{'DONE'.green} (#{"#{((Time.now - start_time) * 100).round / 100.0}ms".cyan}) " : 'FAILED'.red
+        say ok ? "#{'DONE'.green} (#{"#{((Time.now - start_time) * 100).round / 100.0}s".cyan}) " : 'FAILED'.red
       end
     end
     exit(ok)

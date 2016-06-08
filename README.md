@@ -18,7 +18,7 @@ Install
 -------
 
     gem build oneops.gemspec
-    sudo gem install oneops
+    gem install oneops
 
 How To
 ------

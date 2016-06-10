@@ -1,5 +1,6 @@
 class OO::Api::Design::Component < OO::Api::Base
   qualifiers :assembly, :platform, :type
+  support_sticky 'design'
   attr_accessor :sibling_depends_on
 
   def self.all(assembly, platform)

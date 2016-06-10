@@ -42,50 +42,62 @@ $ oneops config set format=json -g
 Help
 ----
 
-    $ oneops
     Usage:
-       oneops [options] command [<args>] [command_options]
+      oneops|oo [options] command [<args>] [command_options]
 
 
     Available options:
 
         -d, --debug                      Output debug info
         -f, --format FORMAT              Output format: console, yaml, json or xml (default: console)
+            --file FILE                  Read attributes from yaml file.
+        -k, --insecure                   Skip SSL validation.
+            --no-color                   Do not colorize output
+        -o, --organization ORGANIZATION  OneOps organization
         -q, --quiet                      No output
         -s, --site SITE                  OneOps host site URL (default: https://api.oneops.com)
-        -o, --organization ORGANIZATION  OneOps organization
-        -R, --raw-output                 Output raw json from API response
-            --file FILE                  Read attributes from yaml file.
-            --no-color                   Do not colorize output
+            --duration                   Show command time duration stat.
 
 
     Available commands:
 
-       version             Display OneOps CLI gem version.
-       help [command>]     Display this help or help for a particular command.
-       config              Set or display global parameters (e.g. login, password, host, default assembly).
+      General
+      -------
+        version             Display OneOps CLI gem version.
+        help [<command>]    Display this help or help for a particular command.
 
-       account             Account management.
-       organization        Organization management.
+      Setup & Configuration
+      ---------------------
+        config              Set or display global parameters (e.g. login, password, host, default assembly).
 
-       catalog             Catalog management.
-       assembly            Assembly management.
-       design              Design management.
-       transition          Transition management.
+      OneOps Management Commands
+      --------------------------
+        account             Account management.
+        organization        Organization management.
+        cloud               Cloud management.
+        catalog             Catalog management.
+        assembly            Assembly management.
+        design              Assembly design management.
+        transition          Assembly transition management.
+        operations          Assmebly operations management.
 
     For more information about commands try:
-       oneops help [command]
+       oneops help <command>
 
 Examples
 --------
 
+* See help for a 'config' command
+
+   `$  oneops help config`
+
+* Set the default organization
+
+   `$  oneops config set organization=<organization> -g`
+
 * Get list of assemblies in your org
 
    `$ oneops assembly`
-
-* Set the organization
-
-   `$  oneops config set organization=<organization> -g`
 
 * Set the assembly name
 
@@ -93,4 +105,16 @@ Examples
 
 * Show all components of a platform
 
-  `$ oneops design component show --organization=<organization> --assembly=<assembly> --platform=<platform> --component=<component>`
+   `$ oneops design component show --organization=<organization> --assembly=<assembly> --platform=<platform> --component=<component>`
+
+* Create a design secure variable (relying on default organization and assembly set via 'config' command)
+
+   `$ oo design variable create SOME-VAR=whatever --secure`
+
+* Update and lock (use '_' after the variable name) an environment secure variable (relying on default organization and assembly set via 'config' command)
+
+   `$ oo transition variable update -e ENVIRONMENT-NAME COOL-VAR_=whatever --secure`
+
+* Update and lock (use '_' after the variable name) attribute 'size' of component in transition (relying on default organization and assembly set via 'config' command), use pretty json output.
+
+   `$ oo transition component update size_=M -f pretty_json -e SOME-ENV -p SOME-PLATFORM -c COMPUTE-COMPONENT`

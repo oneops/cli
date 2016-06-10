@@ -162,25 +162,10 @@ module OO::Api
       #
       def method_missing(method_name, *args)
         if method_name.to_s.end_with?('=')
-          attr_name = method_name.to_s[0...-1]
-          if attr_name.end_with?('_')
-            attr_name = attr_name[0...-1]
-            @sticky_map[attr_name] = @sticky_value
-          else
-            @sticky_map[attr_name] = ''
-          end
-          self[attr_name] = args[0]
-          return
+          self[method_name.to_s[0...-1]] = args[0]
         else
-          attr_name = method_name.to_s
-          if attr_name.end_with?('_')
-            attr_name = attr_name[0...-1]
-            return nil unless @sticky_map[attr_name] == @sticky_value
-          end
-          value = self[attr_name]
-          return value unless value.nil?
+          self[method_name.to_s]
         end
-        super
       end
 
       def [](key)

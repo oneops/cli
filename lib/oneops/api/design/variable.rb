@@ -1,9 +1,39 @@
-class OO::Api::Design::Variable < OO::Api::Base
+class OO::Api::BaseVariable < OO::Api::Base
+  def as_pretty(options)
+    if OO::Cli::Config.format.to_s == 'console'
+      "#{ciName}=#{ciAttributes.secure == 'true' ? ciAttributes.encrypted_value : ciAttributes.value}"
+    else
+      super
+    end
+  end
+
+  def set(value, opts = {})
+    attrs = ciAttributes
+    secure = opts[:secure]
+    sticky = opts[:sticky]
+    if secure && sticky
+      attrs.secure_ = 'true'
+      attrs.encrypted_value_ = value
+    elsif secure && !sticky
+      attrs.secure = 'true'
+      attrs.encrypted_value = value
+    elsif !secure && sticky
+      attrs.secure_ = 'false'
+      attrs.value_ = value
+    else
+      attrs.secure = 'false'
+      attrs.value = value
+    end
+  end
+end
+
+class OO::Api::Design::Variable < OO::Api::BaseVariable
   qualifiers :assembly, :platform
+  support_sticky 'design'
 
   def self.all(assembly, platform)
     if platform
-      ok, data = request(:get, "assemblies/#{assembly}/design/platforms/#{platform}/variables")      
+      ok, data = request(:get, "assemblies/#{assembly}/design/platforms/#{platform}/variables")
     else
       ok, data = request(:get, "assemblies/#{assembly}/design/variables")
     end
@@ -12,13 +42,13 @@ class OO::Api::Design::Variable < OO::Api::Base
 
   def self.find(assembly, platform, variable)
     if platform
-      ok, data = request(:get, "assemblies/#{assembly}/design/platforms/#{platform}/variables/#{variable}")   
+      ok, data = request(:get, "assemblies/#{assembly}/design/platforms/#{platform}/variables/#{variable}")
     else
       ok, data = request(:get, "assemblies/#{assembly}/design/variables/#{variable}")
     end
     return nil unless ok
     variable = new(assembly, platform, data)
-    return variable   
+    return variable
   end
 
   def save

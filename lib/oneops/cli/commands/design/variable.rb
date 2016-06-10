@@ -2,7 +2,8 @@ module OO::Cli
   class Command::Design::Variable < Command::Base
     def option_parser
       OptionParser.new do |opts|
-        opts.on('-p', '--platform PLATFORM', 'Platform name') { |a| Config.set_in_place(:platform, a)}
+        opts.on('-p', '--platform PLATFORM', 'Platform name') {|a| Config.set_in_place(:platform, a)}
+        opts.on('--secure', 'Store as secure variable') {@secure = true}
       end
     end
 
@@ -18,10 +19,16 @@ Available actions:
     design variable list   -a <ASSEMBLY> [-p <PLATFORM>]
     design variable show   -a <ASSEMBLY> [-p <PLATFORM>] <NAME>
     design variable open   -a <ASSEMBLY> [-p <PLATFORM>] <NAME>
-    design variable create -a <ASSEMBLY> [-p <PLATFORM>] <NAME>=<VALUE>
-    design variable update -a <ASSEMBLY> [-p <PLATFORM>] <NAME>=<VALUE>
+    design variable create -a <ASSEMBLY> [-p <PLATFORM>] <NAME>=<VALUE> [--secure]
+    design variable update -a <ASSEMBLY> [-p <PLATFORM>] <NAME>=<VALUE> [--secure]
     design variable delete -a <ASSEMBLY> [-p <PLATFORM>] <NAME>
 
+Note:
+    Use '_' suffix for to lock values ("sticky" assignment).  For example, this sets the value and locks it:
+       oneops transition -a ASSEMBLY variable update some-var_=whatever
+
+    and this one does lock:
+       oneops transition -a ASSEMBLY variable update some-var=whatever
 COMMAND_HELP
     end
 
@@ -55,7 +62,12 @@ COMMAND_HELP
 
     def create(*args)
       name, value = args[0].split('=', 2)
-      variable = OO::Api::Design::Variable.new(Config.assembly, Config.platform, {:ciName => name, :ciAttributes => {:value => value}})
+      sticky = name.end_with?('_')
+      name = name[0..-2] if sticky
+      variable = OO::Api::Design::Variable.new(Config.assembly,
+                                               Config.platform,
+                                               {:ciName => name, :ciAttributes => {}})
+      variable.set(value, :secure => @secure, :sticky => sticky)
       if variable.save
         say variable.to_pretty
       else
@@ -66,8 +78,10 @@ COMMAND_HELP
 
     def update(*args)
       name, value = args[0].split('=', 2)
+      sticky = name.end_with?('_')
+      name = name[0..-2] if sticky
       variable = OO::Api::Design::Variable.find(Config.assembly, Config.platform, name)
-      variable.ciAttributes = {:value => value}
+      variable.set(value, :secure => @secure, :sticky => sticky)
       if variable.save
         say variable.to_pretty
       else

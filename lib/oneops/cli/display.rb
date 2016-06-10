@@ -97,6 +97,10 @@ end
 class Object
   include VMCExtensions
 
+  def to_console(options = {})
+    to_s
+  end
+
   def to_pretty(options = {})
     as_pretty(options).send("to_#{OO::Cli::Config.format.presence || 'console'}", options)
   end

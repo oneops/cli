@@ -1,4 +1,4 @@
-class OO::Api::Transition::Variable < OO::Api::Base
+class OO::Api::Transition::Variable < OO::Api::BaseVariable
   qualifiers :assembly, :environment, :platform
   support_sticky 'manifest'
 

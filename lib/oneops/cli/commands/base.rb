@@ -16,22 +16,19 @@ module OO::Cli
           # exception because we want to give a chance to subcommands to process the options so that options are
           # plucked by relevant command.
           leftover_args = []
+          hide_prefix = "~*~#{SecureRandom.random_number(36**6).to_s(36)}~*~"
           while true
             begin
               leftover_args = @option_parser ? @option_parser.permute!(args.dup) : args
               break
             rescue OptionParser::InvalidOption => e
-              args = args.map do |arg|
-                if arg.start_with?(e.args[0])
-                  arg.dup.insert(0, '~*~*~')
-                else
-                  arg.dup
-                end
-              end
+              i = args.index(e.args[0])
+              raise e if i.nil?
+              args[i] = "#{hide_prefix}#{e.args[0]}"
             end
           end
 
-          leftover_args.collect! {|arg| arg.gsub('~*~*~', '')}
+          leftover_args.map! {|arg| arg.gsub(hide_prefix, '')}
           action = leftover_args.detect {|a| respond_to?(a)}
           if action.present?
             action = leftover_args.delete(action).to_sym

@@ -1,5 +1,6 @@
 class OO::Api::Transition::Component < OO::Api::Base
   qualifiers :assembly, :environment, :platform
+  support_sticky 'manifest'
   attr_accessor :sibling_depends_on
 
   def self.all(assembly, environment, platform)
@@ -17,7 +18,7 @@ class OO::Api::Transition::Component < OO::Api::Base
     payload = {:cms_dj_ci => data, :sibling_depends_on => (sibling_depends_on || []).to_a}
     self.class.request(:put, "assemblies/#{assembly}/transition/environments/#{environment}/platforms/#{platform}/components/#{ci_id}", payload, self)
   end
-  
+
   def touch
     ci_id = data[:ciId]
     self.class.request(:post, "assemblies/#{assembly}/transition/environments/#{environment}/platforms/#{platform}/components/#{ci_id}/touch", nil, self)
@@ -27,7 +28,7 @@ class OO::Api::Transition::Component < OO::Api::Base
     ci_name = data[:ciName]
     self.class.request(:post, "assemblies/#{assembly}/transition/environments/#{environment}/platforms/#{platform}/components/#{ci_name}/deploy", nil, self)
   end
-   
+
   def as_pretty(options)
     result = super
     result[:sibling_depends_on] = sibling_depends_on if sibling_depends_on

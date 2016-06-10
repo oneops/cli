@@ -1,5 +1,6 @@
 class OO::Api::Design::Platform < OO::Api::Base
   qualifiers :assembly
+  support_sticky 'design'
   attr_accessor :links_to
 
   def self.all(assembly)

@@ -27,11 +27,23 @@ Available actions:
     design attachment delete -a <ASSEMBLY> -p <PLATFORM> -c <COMPONENT> -m <ATTACHMENT>
 
 Available attributes:
-
+    basic_auth_user
+    basic_auth_password
+    checksum
+    content
+    exec_cmd
+    headers
     path
     priority
     run_on
+    source
 
+Note:
+    Use '_' suffix for to lock attribute value ("sticky" assignment).  For example, here is "lock" assignment:
+       oneops transition -a ASSEMBLY variable update some-var_=whatever
+
+    and this one is not:
+       oneops transition -a ASSEMBLY variable update some-var=whatever
 COMMAND_HELP
     end
 

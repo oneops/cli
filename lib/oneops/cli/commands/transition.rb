@@ -4,7 +4,7 @@ module OO::Cli
       OptionParser.new do |opts|
         opts.on('-a', '--assembly ASSEMBLY', 'Assembly name') { |a| Config.set_in_place(:assembly, a)}
         opts.on('-e', '--environment ENVIRONMENT', 'Environment name') { |e| Config.set_in_place(:environment, e)}
-        opts.on(      '--comment TEXT', 'Commit comment') { |a| @desc = a}
+        opts.on(      '--comment [TEXT]', 'Commit comment') { |a| @desc = a}
       end
     end
 

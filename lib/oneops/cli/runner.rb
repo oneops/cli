@@ -7,16 +7,18 @@ class OO::Cli::Runner
   attr_reader :args, :options, :option_parser
 
   OPTION_PARSER = OptionParser.new do |opts|
+    formats = %w(console yaml json xml pretty_json)
+
     opts.banner = "\nAvailable options:\n\n"
 
     opts.on('-d', '--debug', 'Output debug info') { OO::Cli::Config.debug = true }
-    opts.on('-f', '--format FORMAT', [:console, :yaml, :json, :xml, :pretty_json], 'Output format: console, yaml, json or xml (default: console)') { |f| OO::Cli::Config.set_in_place(:format, f) }
-    opts.on('--file FILE', 'Read attributes from  yaml file.') { |f| @attributes_file = f }
+    opts.on('-f', '--format FORMAT', formats, "Output format: #{formats.join(', ')} (default: console)") { |f| OO::Cli::Config.set_in_place(:format, f) }
+    opts.on('--file FILE', 'Read attributes from yaml file.') { |f| @attributes_file = f }
     opts.on('-k', '--insecure', 'Skip SSL validation.') { OO::Cli::Config.set_in_place(:insecure, 'true') }
     opts.on('--no-color', 'Do not colorize output') { OO::Cli::Config.colorize = false }
     opts.on('-o', '--organization ORGANIZATION', 'OneOps organization') { |organization| OO::Cli::Config.set_in_place(:organization, organization)}
     opts.on('-q', '--quiet', 'No output') { OO::Cli::Config.output = nil }
-    opts.on('-R', '--raw-output', 'Output raw json from API response') { OO::Cli::Config.set_in_place(:raw_output, true) }
+    # opts.on('-R', '--raw-output', 'Output raw json from API response') { OO::Cli::Config.set_in_place(:raw_output, true) }
     opts.on('-s', '--site SITE', 'OneOps host site URL (default: https://api.oneops.com)') { |site| OO::Cli::Config.set_in_place(:site, site)}
     opts.on('--duration', 'Show command time duration stat.') { OO::Cli::Config.set_in_place(:timing, 'true') }
   end
@@ -35,19 +37,19 @@ class OO::Cli::Runner
     begin
       trap('TERM') { print "\nTerminated\n"; exit(false) }
 
-      parse_options!
+      args = parse_options
 
       if @attributes_file.present?
         OO::Cli::Config.set_in_place(:attributes_file, @attributes_file)
-        YAML.load(File.open(@attributes_file)).each_pair { |k, v| @args << "#{k}=#{v}" }
+        YAML.load(File.open(@attributes_file)).each_pair { |k, v| args << "#{k}=#{v}" }
       end
 
       # By default (no arguments) run general help command.
-      if @args.blank?
-        @args << 'help'
+      if args.blank?
+        args << 'help'
       end
-      help = @args.delete('help')
-      args = @args.blank? ? [] : @args.shift.split(/\/|:/) + @args
+      help = args.delete('help')
+      args = args.blank? ? [] : args.shift.split(/\/|:/) + args
       command = help || args.shift
 
       begin
@@ -93,27 +95,20 @@ class OO::Cli::Runner
 
   private
 
-  def parse_options!
-
-    # This obscured technique is to work around InvalidOption exception of OptionParser.  This will allow us to pluck relevant (see above)
-    # options no matter where they located in the whole command line string.
+  def parse_options
+    args = @args
+    # This obscure technique is to work around InvalidOption exception of OptionParser.  This will allow us to pluck
+    # relevant (see above) options no matter where they located in the whole command line string.
     leftover_args = []
+    hide_prefix = "~*~#{SecureRandom.random_number(36**6).to_s(36)}~*~"
     while true
       begin
-        leftover_args = OPTION_PARSER.permute!(@args.dup)
+        leftover_args = OPTION_PARSER.permute!(args.dup)
         break
       rescue OptionParser::InvalidOption => e
-        @args = @args.map do |arg|
-          if arg.start_with?(e.args[0])
-            arg.dup.insert(0, '~*~*~')
-          else
-            arg.dup
-          end
-        end
+        args[args.index(e.args[0])] = "#{hide_prefix}#{e.args[0]}"
       end
     end
-
-    leftover_args.collect! {|arg| arg.gsub('~*~*~', '')}
-    @args = leftover_args
+    leftover_args.map {|arg| arg.gsub(hide_prefix, '')}
   end
 end

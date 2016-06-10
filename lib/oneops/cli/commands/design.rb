@@ -1,9 +1,9 @@
-module OO::Cli
+  module OO::Cli
   class Command::Design < Command::Base
     def option_parser
       OptionParser.new do |opts|
         opts.on('-a', '--assembly ASSEMBLY', 'Assembly name') { |a| Config.set_in_place(:assembly, a)}
-        opts.on('-C', '--desc TEXT', 'Commit comment') { |a| @desc = a}
+        opts.on(      '--comment [TEXT]', 'Commit comment') { |a| @desc = a}
         opts.on('-f', '--format FORMAT', [:yaml, :json], 'Output format: yaml or xml (default: yaml)') { |f| OO::Cli::Config.set_in_place(:format, f) }
         opts.on('--file FILE', 'Design configuration file in yaml or json format (defaults to "oneops-design.yaml" in local dir).') { |f| @design_file = f }
       end

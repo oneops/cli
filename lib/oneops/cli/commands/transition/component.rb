@@ -88,6 +88,13 @@ Available attributes:
 
     Varies by component type.
 
+Note:
+    Use '_' suffix for to lock attribute value ("sticky" assignment).  For example, here is "lock" assignment:
+       oneops transition -a ASSEMBLY variable update some-var_=whatever
+
+    and this one is not:
+       oneops transition -a ASSEMBLY variable update some-var=whatever
+
 COMMAND_HELP
     end
   end

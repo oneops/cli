@@ -1,5 +1,6 @@
 class OO::Api::Design::Attachment < OO::Api::Base
   qualifiers :assembly, :platform, :component
+  support_sticky 'design'
 
   def self.all(assembly, platform, component)
     ok, data = request(:get, "assemblies/#{assembly}/design/platforms/#{platform}/components/#{component}/attachments")

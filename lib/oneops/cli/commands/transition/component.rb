@@ -4,7 +4,7 @@ module OO::Cli
       OptionParser.new do |opts|
         opts.on('-p', '--platform PLATFORM', 'Platform name') { |p| Config.set_in_place(:platform, p)}
         opts.on('-c', '--component COMPONENT', 'Component name') { |c| Config.set_in_place(:component, c)}
-        opts.on('-d', '--sibling_depends C1[,C2[,...]]', Array, 'Dependence to other sibling components (i.e. of the same type)') { |sd|  @sibling_depends = sd}
+        opts.on('-d', '--sibling_depends C1[,C2[,...]]', Array, 'Dependence to other sibling components (i.e. of the same type)') { |sd|  b@sibling_depends = sd}
       end
     end
 

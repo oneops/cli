@@ -57,6 +57,7 @@ module OO
 
         def configure_api
           OO::Api::Config.debug = OO::Cli::Config.debug
+          OO::Api::Config.timeout = OO::Cli::Config.timeout
           OO::Api::Config.verify_ssl = (OO::Cli::Config.insecure != 'true')
           OO::Api::Config.organization = OO::Cli::Config.organization
 

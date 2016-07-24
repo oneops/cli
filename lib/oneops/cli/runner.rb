@@ -21,6 +21,7 @@ class OO::Cli::Runner
     # opts.on('-R', '--raw-output', 'Output raw json from API response') { OO::Cli::Config.set_in_place(:raw_output, true) }
     opts.on('-s', '--site SITE', 'OneOps host site URL (default: https://api.oneops.com)') { |site| OO::Cli::Config.set_in_place(:site, site)}
     opts.on('--duration', 'Show command time duration stat.') { OO::Cli::Config.set_in_place(:timing, 'true') }
+    opts.on('--timeout TIMEOUT_IN_SECONDS', 'Specify http response timeout in seconds. Specify 0 to disable the timeout.') {|t| OO::Cli::Config.set_in_place(:timeout, t.to_i) }
   end
 
   def self.run(args)
@@ -75,6 +76,10 @@ class OO::Cli::Runner
       say('Not Authorized'.red)
     rescue OO::Api::NotFoundException
       say('Not Found'.red)
+      ok = true
+    rescue RestClient::RequestTimeout
+      say('Timed out'.red)
+      say('Use --timeout option to specify timeout.')
       ok = true
     rescue Interrupt
       ok = true

@@ -74,6 +74,7 @@ Optional settings:
 
     insecure     Set to 'true' to skip SSL verification (not SSL certificate validation).
     timing       Set to 'true' to display command execution duration.
+    timeout      Specify http response timeout in seconds. Specify 0 to disable the timeout.
 
 
 Optional parameters:

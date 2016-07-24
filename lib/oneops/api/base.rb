@@ -31,11 +31,17 @@ module OO::Api
         else
           url = "#{OO::Api::Config.site}/#{path}"
         end
-        status, body = perform_http_request({:method     => method,
-                                             :url        => url,
-                                             :payload    => payload,
-                                             :headers    => headers,
-                                             :verify_ssl => OO::Api::Config.verify_ssl})
+        opts = {:method     => method,
+                :url        => url,
+                :payload    => payload,
+                :headers    => headers,
+                :verify_ssl => OO::Api::Config.verify_ssl}
+        timeout = OO::Api::Config.timeout
+        if timeout
+          timeout = timeout.to_i
+          opts[:timeout] = timeout > 0 ? timeout : nil
+        end
+        status, body = perform_http_request(opts)
 
         if status >= 200 && status < 210
           if url =~ (/\.yaml(\?.*)?$/)

@@ -49,14 +49,15 @@ Help
     Available options:
 
         -d, --debug                      Output debug info
-        -f, --format FORMAT              Output format: console, yaml, json or xml (default: console)
+            --duration                   Show command time duration stat.
+        -f, --format FORMAT              Output format: console, yaml, json, xml, pretty_json (default: console)
             --file FILE                  Read attributes from yaml file.
         -k, --insecure                   Skip SSL validation.
             --no-color                   Do not colorize output
         -o, --organization ORGANIZATION  OneOps organization
         -q, --quiet                      No output
         -s, --site SITE                  OneOps host site URL (default: https://api.oneops.com)
-            --duration                   Show command time duration stat.
+            --timeout TIMEOUT_IN_SECONDS Specify http response timeout in seconds. Specify 0 to disable the timeout.
 
 
     Available commands:

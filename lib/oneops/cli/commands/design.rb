@@ -50,7 +50,7 @@ COMMAND_HELP
     end
 
     def validate(action, *args)
-      unless Config.assembly
+      unless action == :packs || Config.assembly
         say 'Please specify assembly!'.red
         return false
       end

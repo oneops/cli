@@ -91,11 +91,6 @@ COMMAND_HELP
 
     end
     
-#    protected
-    
-#    def process(*args)
-#      doit(*args)
-#    end
 
   end
 end

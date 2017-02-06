@@ -1,36 +1,32 @@
-  module OO::Cli
+module OO::Cli
   class Command::Go < Command::Base
+    
+    #def process(*args)
+    #  go(*args)
+    #end
 
     require 'yaml'
         
-    def option_parser
-      OptionParser.new do |opts|
-        opts.on('-f', '--file FILE', 'yaml or json file with command(s)') { |f| OO::Cli::Config.set_in_place(:cmd_file, f) }
-      end
-    end
-
     def help(*args)
       display <<-COMMAND_HELP
 Usage:
-   oneops go doit design-env-deploy.yaml
-
-   go doit: yaml multi-part/stream file based input
+   oo go design-env-deploy.yaml
 
 Available actions:
 
-    go doit <YAML FILE>
+   oo go <YAML FILE>
 
 COMMAND_HELP
     end
     
-    def default(*args)
+    def doit(*args)
       go(*args)
     end
     
-    def doit(*args)
-      go(*args)      
+    def print_end
+      puts "### end ###\n\n\n".blue 
     end
-
+    
     def go(*args)
       
       cmd_file = args.shift
@@ -40,10 +36,23 @@ COMMAND_HELP
       end
 
       say "Using file: #{cmd_file.cyan}"
+      
+      part = 0
 
       YAML.load_stream(File.read(cmd_file)) do |cmd|
-        puts "### start ###"
-        puts "#{JSON.pretty_generate(cmd)}"
+        part += 1
+        say "### start #{Time.now} part: #{part} ###".blue
+        say "#{JSON.pretty_generate(cmd)}".green
+        if cmd.has_key?('sleep')
+          puts "sleeping #{cmd['sleep']}s..."
+          sleep cmd['sleep']
+          print_end
+          next
+        end
+        unless cmd.has_key?('aspect')
+          say "missing aspect attr in the command".red
+          exit 1
+        end
         command = OO::Cli::Command.const_get(cmd['aspect'].capitalize)
         
         args = []
@@ -67,12 +76,21 @@ COMMAND_HELP
             args.push "#{k}=#{v}"
           end
         end
-        puts "args: #{args}" if Config.debug
+
         start = Time.now.to_f
-        command.new.send(:process, *args)
+        
+        # use forked cli + jq for filtering ie get ip or other attribute value list
+        if cmd.has_key?('jq')
+          cmd_line = "oo #{cmd['aspect']} #{args.join(' ')} -f json | jq '#{cmd['jq']}'"
+          puts cmd_line
+          puts `#{cmd_line}`
+        else
+          command.new.send(:process, *args)          
+        end
+        
         duration = (Time.now.to_f - start).round(3)
         puts "took: #{duration}ms"
-        puts "### end ###\n\n\n"
+        print_end
       end
 
     end

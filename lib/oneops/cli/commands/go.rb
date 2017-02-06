@@ -25,6 +25,11 @@ COMMAND_HELP
     
     def go(*args)
       
+      if args.size == 0
+        help(*args)
+        exit 1
+      end
+      
       cmd_file = args.shift
       unless File.exists?(cmd_file)
         say "Could not find file: #{cmd_file.magenta}".red

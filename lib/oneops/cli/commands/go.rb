@@ -1,10 +1,6 @@
 module OO::Cli
   class Command::Go < Command::Base
     
-    #def process(*args)
-    #  go(*args)
-    #end
-
     require 'yaml'
         
     def help(*args)
@@ -19,7 +15,7 @@ Available actions:
 COMMAND_HELP
     end
     
-    def doit(*args)
+    def default(*args)
       go(*args)
     end
     
@@ -94,6 +90,12 @@ COMMAND_HELP
       end
 
     end
+    
+#    protected
+    
+#    def process(*args)
+#      doit(*args)
+#    end
 
   end
 end

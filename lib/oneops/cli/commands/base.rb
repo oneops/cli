@@ -32,7 +32,8 @@ module OO::Cli
           action = leftover_args.detect {|a| respond_to?(a)}
           if action.present?
             action = leftover_args.delete(action).to_sym
-          elsif leftover_args.blank?
+          # go command has simplified args
+          elsif leftover_args.blank? || self.respond_to?('go')
             action = :default
           else
             say "Invalid action for command <#{self.class.name.split('::').last.downcase}>".red

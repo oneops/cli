@@ -19,7 +19,8 @@ Available actions:
 
     transition platform list   -a <ASSEMBLY> -e <ENVIRONMENT>
     transition platform show   -a <ASSEMBLY> -e <ENVIRONMENT> -p <PLATFORM>
-    transition platform toggle -a <ASSEMBLY> -e <ENVIRONMENT> -p <PLATFORM>
+    transition platform enable -a <ASSEMBLY> -e <ENVIRONMENT> -p <PLATFORM>
+    transition platform disable -a <ASSEMBLY> -e <ENVIRONMENT> -p <PLATFORM>
 
 COMMAND_HELP
     end
@@ -47,14 +48,24 @@ COMMAND_HELP
       say platform.to_pretty
     end
 
-    def toggle(*args)
+    def enable(*args)
       platform = OO::Api::Transition::Platform.find(Config.assembly, Config.environment, Config.platform)
-      if platform.toggle
-        say platform.to_pretty
+      env = OO::Api::Transition::Environment.find(Config.assembly, Config.environment)
+      if env.enable([platform.ciId.to_i])
+        say 'Successfully enabled platform.'.green
       else
-        say "#{'Failed:'.yellow}\n   #{platform.errors.join("\n   ")}"
+        say "#{'Failed:'.yellow}\n   #{env.errors.join("\n   ")}"
       end
     end
 
+    def disable(*args)
+      platform = OO::Api::Transition::Platform.find(Config.assembly, Config.environment, Config.platform)
+      env = OO::Api::Transition::Environment.find(Config.assembly, Config.environment)
+      if env.disable([platform.ciId.to_i])
+        say 'Successfully disabled platform.'.green
+      else
+        say "#{'Failed:'.yellow}\n   #{env.errors.join("\n   ")}"
+      end
+    end
   end
 end

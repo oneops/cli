@@ -2,7 +2,7 @@ module OO::Cli
   class Command::Transition::Environment < Command::Base
     def option_parser
       OptionParser.new do |opts|
-        opts.on('-availability', '--environment ENVIRONMENT', 'Environment name') { |e| Config.set_in_place(:environment, e)}
+        opts.on('-e', '--environment ENVIRONMENT', 'Environment name') { |e| Config.set_in_place(:environment, e)}
         opts.on(      '--clouds \'{<cloud_name_or_id>:{"priority":<1|2>,"dpmt_order":<order>,"pct_scale":<percent>},...}\'', 'Clouds.') { |cc| @clouds = cc}
         opts.on(      '--availability [PLATFORM=single|default,[...]]', Array, 'Platform availability') { |pa| @platform_availability = pa.presence || []}
       end
@@ -89,12 +89,14 @@ module OO::Cli
 
     def enable(*args)
       env = OO::Api::Transition::Environment.find(Config.assembly, Config.environment)
-      say "#{'Failed:'.yellow}\n   #{env.errors.join("\n   ")}" unless env.enable
+      plats = OO::Api::Transition::Platform.all(Config.assembly, Config.environment)
+      say "#{'Failed:'.yellow}\n   #{env.errors.join("\n   ")}" unless env.enable(plats.map(&:ciId))
     end
 
     def disable(*args)
       env = OO::Api::Transition::Environment.find(Config.assembly, Config.environment)
-      say "#{'Failed:'.yellow}\n   #{env.errors.join("\n   ")}" unless env.disable
+      plats = OO::Api::Transition::Platform.all(Config.assembly, Config.environment)
+      say "#{'Failed:'.yellow}\n   #{env.errors.join("\n   ")}" unless env.disable(plats.map(&:ciId))
     end
 
     def delete(*args)
@@ -114,12 +116,12 @@ Usage:
 Available actions:
 
     transition environment list    -a <ASSEMBLY>
-    transition environment show    -a <ASSEMBLY> -availability <ENVIRONMENT>
-    transition environment create  -a <ASSEMBLY> -availability <ENVIRONMENT> --clouds CLOUDS_JSON [<attribute>=<VALUE> [<attribute>=<VALUE> ...]] [--availability <PLATFORM>=single|redundant[,...]]
-    transition environment update  -a <ASSEMBLY> -availability <ENVIRONMENT> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]]
-    transition environment enable  -a <ASSEMBLY> -availability <ENVIRONMENT>
-    transition environment disable -a <ASSEMBLY> -availability <ENVIRONMENT>
-    transition environment delete  -a <ASSEMBLY> -availability <ENVIRONMENT>
+    transition environment show    -a <ASSEMBLY> -e <ENVIRONMENT>
+    transition environment create  -a <ASSEMBLY> -e <ENVIRONMENT> --clouds CLOUDS_JSON [<attribute>=<VALUE> [<attribute>=<VALUE> ...]] [--availability <PLATFORM>=single|redundant[,...]]
+    transition environment update  -a <ASSEMBLY> -e <ENVIRONMENT> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]]
+    transition environment enable  -a <ASSEMBLY> -e <ENVIRONMENT>
+    transition environment disable -a <ASSEMBLY> -e <ENVIRONMENT>
+    transition environment delete  -a <ASSEMBLY> -e <ENVIRONMENT>
 
 Example:
    transition environment update -a ASSEMBLY1 -e QA debug=true --clouds '{"qa-cdc1":{"priority":1,"dpmt_order":3},"prod-dfw3":{"pct_scale":75,"priority":1},"prod-dfw4":{"priority":2}}' --availability tomcat_plat=default

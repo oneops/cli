@@ -40,12 +40,12 @@ class OO::Api::Transition::Environment < OO::Api::Base
     return self.class.request(:post, "assemblies/#{assembly}/transition/environments/#{data[:ciId]}/commit", {:desc => description}, self)
   end
 
-  def enable
-    return self.class.request(:put, "assemblies/#{assembly}/transition/environments/#{data[:ciId]}/enable", '', self)
+  def enable(platform_ids = nil)
+    return self.class.request(:put, "assemblies/#{assembly}/transition/environments/#{data[:ciId]}/enable", platform_ids.present? ? {:platformCiIds => platform_ids} : nil, self)
   end
 
-  def disable
-    return self.class.request(:put, "assemblies/#{assembly}/transition/environments/#{data[:ciId]}/disable", '', self)
+  def disable(platform_ids = nil)
+    return self.class.request(:put, "assemblies/#{assembly}/transition/environments/#{data[:ciId]}/disable", platform_ids.present? ? {:platformCiIds => platform_ids} : nil, self)
   end
 
   def as_pretty(options)

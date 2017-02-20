@@ -43,6 +43,7 @@ module OO::Api
         end
         status, body = perform_http_request(opts)
 
+        $_LAST_API_RESPONSE_STATUS = status
         if status >= 200 && status < 210
           if url =~ (/\.yaml(\?.*)?$/)
             data = body

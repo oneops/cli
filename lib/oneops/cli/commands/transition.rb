@@ -58,32 +58,6 @@ module OO::Cli
       end
     end
 
-    def commit(*args)
-      release = OO::Api::Transition::Release.latest(Config.assembly, Config.environment)
-      env = OO::Api::Transition::Environment.find(Config.assembly, Config.environment)
-      if env.commit(@desc)
-        release = OO::Api::Transition::Release.latest(Config.assembly, Config.environment)
-        release_status(release)
-      else
-        say "#{'Failed:'.yellow}\n   #{env.errors.join("\n   ")}"
-      end
-    end
-
-    def discard(*args)
-      release = OO::Api::Transition::Release.latest(Config.assembly, Config.environment)
-      if release && release.releaseState == 'open'
-        if release.discard
-          release = OO::Api::Transition::Release.latest(Config.assembly, Config.environment)
-          release_status(release)
-        else
-          say "#{'Failed:'.yellow}\n   #{release.errors.join("\n   ")}"
-        end
-      else
-        say "Nothing to discard!".yellow
-        release_status(release)
-      end
-    end
-
     def variable(*args)
        OO::Cli::Command::Transition::Variable.new.process(*args)
      end
@@ -135,9 +109,6 @@ Available actions:
 
     transition show    -a <ASSEMBLY> -e <ENVIRONMENT>
     transition pull    -a <ASSEMBLY> -e <ENVIRONMENT> [<PLATFORM>=single|redundant [...]]
-    transition commit  -a <ASSEMBLY> -e <ENVIRONMENT> [--comment <COMMENT>]
-    transition discard -a <ASSEMBLY> -e <ENVIRONMENT>
-
 
 Available subcommands:
 
@@ -172,7 +143,6 @@ COMMAND_HELP
           say "#{release.description}".cyan
         end
       end
-
     end
 
     def deployment_status

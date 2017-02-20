@@ -111,7 +111,7 @@ COMMAND_HELP
     end
 
     def load(*args)
-      @design_file = Config.attributes_file
+      @design_file ||= Config.attributes_file
       unless @design_file
         @design_file = args.first if args.length == 1
         unless @design_file.present?

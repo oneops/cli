@@ -4,8 +4,18 @@ module OO::Cli
   module Command
     class Base
       @@configure_api = true
+
       def self.skip_configure_api
         @@configure_api = false
+      end
+
+      @success = false
+      def success?
+        @success
+      end
+
+      def failed?
+        !success?
       end
 
       def process(*args)
@@ -41,7 +51,9 @@ module OO::Cli
 
           return unless validate(action, *leftover_args)
 
-          send(action, *leftover_args)
+          result = send(action, *leftover_args)
+          @success = !$_LAST_API_RESPONSE_STATUS || ($_LAST_API_RESPONSE_STATUS >= 200 && $_LAST_API_RESPONSE_STATUS < 210)
+          result
         end
       end
 

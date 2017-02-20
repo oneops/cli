@@ -40,6 +40,10 @@ class OO::Api::Transition::Environment < OO::Api::Base
     return self.class.request(:post, "assemblies/#{assembly}/transition/environments/#{data[:ciId]}/commit", {:desc => description}, self)
   end
 
+  def discard
+    return self.class.request(:post, "assemblies/#{assembly}/transition/environments/#{data[:ciId]}/discard", nil, self)
+  end
+
   def enable(platform_ids = nil)
     return self.class.request(:put, "assemblies/#{assembly}/transition/environments/#{data[:ciId]}/enable", platform_ids.present? ? {:platformCiIds => platform_ids} : nil, self)
   end

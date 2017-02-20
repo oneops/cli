@@ -5,6 +5,7 @@ module OO::Cli
         opts.on('-e', '--environment ENVIRONMENT', 'Environment name') { |e| Config.set_in_place(:environment, e)}
         opts.on(      '--clouds \'{<cloud_name_or_id>:{"priority":<1|2>,"dpmt_order":<order>,"pct_scale":<percent>},...}\'', 'Clouds.') { |cc| @clouds = cc}
         opts.on(      '--availability [PLATFORM=single|default,[...]]', Array, 'Platform availability') { |pa| @platform_availability = pa.presence || []}
+        opts.on('-i', '--interval SECONDS', 'Poll interval in seconds for status of deployment plan generation on commit (default - 5 seconds, specify 0 to return immediately)') { |i| @poll_interval = i.to_i}
       end
     end
 
@@ -104,6 +105,63 @@ module OO::Cli
       say "#{'Failed:'.yellow}\n   #{env.errors.join("\n   ")}" unless env.destroy
     end
 
+    def commit(*args)
+      release = OO::Api::Transition::Release.latest(Config.assembly, Config.environment)
+      unless release && release.releaseState == 'open'
+        say 'Nothing to commit!'.yellow
+        return
+      end
+
+      env = OO::Api::Transition::Environment.find(Config.assembly, Config.environment)
+      if env.commit(@desc)
+        release = OO::Api::Transition::Release.latest(Config.assembly, Config.environment)
+        say 'Committed release.'
+        release_status(release)
+        return if @poll_interval == 0
+
+        interval = (@poll_interval || 5).to_i
+        generating = true
+        say 'Waiting for deployment plan generation.'
+        while generating do
+          env = OO::Api::Transition::Environment.find(Config.assembly, Config.environment)
+          blurt Time.now.strftime('%H:%M:%S')
+          blurt ' ... '
+          say "generating...\n"
+          if env.ciState == 'locked'
+            sleep interval
+          else
+            generating = false
+          end
+        end
+        comments = env.comments
+        say comments.start_with?('ERROR:') ? comments.red : comments
+      else
+        say "#{'Failed:'.yellow}\n   #{env.errors.join("\n   ")}"
+      end
+    end
+
+    def discard(*args)
+      release = OO::Api::Transition::Release.latest(Config.assembly, Config.environment)
+      if release && release.releaseState == 'open'
+        env = OO::Api::Transition::Environment.find(Config.assembly, Config.environment)
+        if env.discard
+          release = OO::Api::Transition::Release.latest(Config.assembly, Config.environment)
+          say 'Discarded release.'
+          release_status(release)
+        else
+          say "#{'Failed:'.yellow}\n   #{env.errors.join("\n   ")}"
+        end
+      else
+        release_status(release)
+        say 'Nothing to discard!'.yellow
+      end
+    end
+
+    def open(*args)
+      env = OO::Api::Transition::Environment.find(Config.assembly, Config.environment)
+      open_ci(env.ciId)
+    end
+
     def help(*args)
       display <<-COMMAND_HELP
 Usage:
@@ -117,11 +175,14 @@ Available actions:
 
     transition environment list    -a <ASSEMBLY>
     transition environment show    -a <ASSEMBLY> -e <ENVIRONMENT>
+    transition environment open    -a <ASSEMBLY> -e <ENVIRONMENT>
     transition environment create  -a <ASSEMBLY> -e <ENVIRONMENT> --clouds CLOUDS_JSON [<attribute>=<VALUE> [<attribute>=<VALUE> ...]] [--availability <PLATFORM>=single|redundant[,...]]
     transition environment update  -a <ASSEMBLY> -e <ENVIRONMENT> [<attribute>=<VALUE> [<attribute>=<VALUE> ...]]
     transition environment enable  -a <ASSEMBLY> -e <ENVIRONMENT>
     transition environment disable -a <ASSEMBLY> -e <ENVIRONMENT>
     transition environment delete  -a <ASSEMBLY> -e <ENVIRONMENT>
+    transition environment commit  -a <ASSEMBLY> -e <ENVIRONMENT> [--comment <COMMENT>]
+    transition environment discard -a <ASSEMBLY> -e <ENVIRONMENT>
 
 Example:
    transition environment update -a ASSEMBLY1 -e QA debug=true --clouds '{"qa-cdc1":{"priority":1,"dpmt_order":3},"prod-dfw3":{"pct_scale":75,"priority":1},"prod-dfw4":{"priority":2}}' --availability tomcat_plat=default
@@ -145,6 +206,17 @@ COMMAND_HELP
         unless priority == 1 || priority == 2
           say 'Invalid clouds specification - make sure to specify priority of 1 or 2 for each cloud!'.red
           return nil
+        end
+      end
+    end
+
+    def release_status(release)
+      if release
+        say "\nRelease: #{release.releaseId.to_s.cyan} (#{release.releaseState.yellow}) created by #{release.createdBy.magenta} #{Time.at(release.created / 1000)}."
+        if release.releaseState == 'closed'
+          say "  Committed by #{release.commitedBy.magenta} #{Time.at(release.updated / 1000)}."
+          blurt '  Description: '
+          say "#{release.description}".cyan
         end
       end
     end
